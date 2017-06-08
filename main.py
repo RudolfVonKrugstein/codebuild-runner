@@ -6,7 +6,7 @@ import getopt
 
 #parse command line arguments
 try:
-    opts, args = getopt.getopt(sys.argv[1:],"",["project-name=","source-path="])
+    opts, args = getopt.getopt(sys.argv[1:],"",["project-name=","source-path=","source-excludes="])
 except getopt.GetoptError:
     print("Usage: main.py --project-name <codebuild-project-name> --source-path <source-path> --source-excludes <comma-seperated-excludes>")
     sys.exit(2)

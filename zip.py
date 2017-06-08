@@ -28,19 +28,20 @@ def zipws(path, excludes = [], keep=False):
     #  in it.
     #
     for (dirpath, dirnames, filenames) in os.walk(path):
+        exclude = False
+        for e in excludes:
+            if dirpath[len(path)+1:].startswith(e):
+                exclude = True
+                print("Exclude " + dirpath)
+                break
+        if exclude:
+            continue
         # Iterate over every file name
         #
         for file in filenames:
             # Ignore .lock files
             #
             if file.endswith('.lock'):
-                continue
-            exclude = False
-            for e in excludes:
-                if dirpath.startswith(e):
-                    exclude = True
-                    break
-            if exclude:
                 continue
 
             try:

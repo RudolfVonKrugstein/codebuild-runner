@@ -14,13 +14,13 @@ class CodeBuildHandler:
     def prepareBuild(self,sourcePath,sourceExcludes):
         projectInfo = self.client.batch_get_projects(names=[self.projectName])['projects'][0]
         bucketPath = projectInfo['source']['location']
-        print("Zipping current directory")
+        print("Zipping " + sourcePath)
         binaryZip = zip.zipws(sourcePath,sourceExcludes)
         s3_client = boto3.client('s3')
 
         bucket=bucketPath.split("/")[0].split(":")[-1]
         key=bucketPath.split("/",1)[1]
-        print("Uploading zip to %s/%s" % (bucket,key))
+        print("Uploading zip to %s/%s (%i Kb)" % (bucket,key,len(binaryZip)/1024))
         res = s3_client.put_object(Body=binaryZip, Bucket=bucket, Key=key)
         self.sourceVersion = res['VersionId']
         print("SourceVersion set to %s" % self.sourceVersion)

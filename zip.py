@@ -19,7 +19,7 @@ import tempfile
 #  the input folder name will not appear in the zip file.
 #
 def zipws(path, excludes = [], keep=False):
-    outfile = tempfile.NamedTemporaryFile(delete=False)
+    outfile = tempfile.NamedTemporaryFile(delete=True)
     zip = zipfile.ZipFile(outfile, 'w', zipfile.ZIP_DEFLATED)
 
     path = os.path.normpath(path)

@@ -45,6 +45,7 @@ while not cbHandler.testBuildFinished():
 newEvents = logsWatcher.getNewLogEvents()
 logsWatcher.printLogEvents(newEvents)
 
+cbHandler.cleanupBuild(sourcePath,sourceExcludes)
 print("Finished, exiting")
 # return result
 exit(not cbHandler.didBuildSucceed())

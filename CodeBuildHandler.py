@@ -10,6 +10,8 @@ class CodeBuildHandler:
         self.buildResult = None
         self.buildId = None
         self.sourceVersion = None
+        self.codeBucket = None
+        self.codeKey = None
 
     def prepareBuild(self,sourcePath,sourceExcludes):
         projectInfo = self.client.batch_get_projects(names=[self.projectName])['projects'][0]
@@ -18,12 +20,16 @@ class CodeBuildHandler:
         binaryZip = zip.zipws(sourcePath,sourceExcludes)
         s3_client = boto3.client('s3')
 
-        bucket=bucketPath.split("/")[0].split(":")[-1]
-        key=bucketPath.split("/",1)[1]
-        print("Uploading zip to %s/%s (%i Kb)" % (bucket,key,len(binaryZip)/1024))
-        res = s3_client.put_object(Body=binaryZip, Bucket=bucket, Key=key)
+        self.codeBucket=bucketPath.split("/")[0].split(":")[-1]
+        self.codeKey=bucketPath.split("/",1)[1]
+        print("Uploading zip to %s/%s (%i Kb)" % (self.codeBucket,self.codeKey,len(binaryZip)/1024))
+        res = s3_client.put_object(Body=binaryZip, Bucket=self.codeBucket, Key=self.codeKey)
         self.sourceVersion = res['VersionId']
         print("SourceVersion set to %s" % self.sourceVersion)
+
+    def cleanupBuild(self):
+        s3_client = boto3.client('s3')
+        s3_client.delete_object(Bucket=self.codeBucket, Key=self.codeKey, VersionID=self.sourceVersion)
 
     def startBuild(self):
         res = self.client.start_build(projectName=self.projectName,sourceVersion=self.sourceVersion)

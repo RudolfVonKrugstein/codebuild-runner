@@ -11,11 +11,11 @@ class CodeBuildHandler:
         self.buildId = None
         self.sourceVersion = None
 
-    def prepareBuild(self,sourcePath):
+    def prepareBuild(self,sourcePath,sourceExcludes):
         projectInfo = self.client.batch_get_projects(names=[self.projectName])['projects'][0]
         bucketPath = projectInfo['source']['location']
         print("Zipping current directory")
-        binaryZip = zip.zipws(sourcePath)
+        binaryZip = zip.zipws(sourcePath,sourceExcludes)
         s3_client = boto3.client('s3')
 
         bucket=bucketPath.split("/")[0].split(":")[-1]

@@ -12,12 +12,13 @@
 import sys, zipfile, os
 import tempfile
 
+
 # Function for zipping files.  If keep is true, the folder, along with 
 #  all its contents, will be written to the zip file.  If false, only 
 #  the contents of the input folder will be written to the zip file - 
 #  the input folder name will not appear in the zip file.
 #
-def zipws(path, keep=False):
+def zipws(path, excludes = [], keep=False):
     outfile = tempfile.NamedTemporaryFile(delete=False)
     zip = zipfile.ZipFile(outfile, 'w', zipfile.ZIP_DEFLATED)
 
@@ -32,17 +33,26 @@ def zipws(path, keep=False):
         for file in filenames:
             # Ignore .lock files
             #
-            if not file.endswith('.lock'):
-                try:
-                    if keep:
-                        zip.write(os.path.join(dirpath, file),
-                        os.path.join(os.path.basename(path), os.path.join(dirpath, file)[len(path)+len(os.sep):]))
-                    else:
-                        zip.write(os.path.join(dirpath, file),            
-                        os.path.join(dirpath[len(path):], file)) 
-                        
-                except Exception, e:
-                    print("WARNING: Error adding %s: %s"  % (file,e))
+            if file.endswith('.lock'):
+                continue
+            exclude = False
+            for e in excludes:
+                if dirpath.startswith(e):
+                    exclude = True
+                    break
+            if exclude:
+                continue
+
+            try:
+                if keep:
+                    zip.write(os.path.join(dirpath, file),
+                    os.path.join(os.path.basename(path), os.path.join(dirpath, file)[len(path)+len(os.sep):]))
+                else:
+                    zip.write(os.path.join(dirpath, file),
+                    os.path.join(dirpath[len(path):], file))
+
+            except Exception, e:
+                print("WARNING: Error adding %s: %s"  % (file,e))
 
     # get the file as binary
     zip.close()

@@ -8,24 +8,28 @@ import getopt
 try:
     opts, args = getopt.getopt(sys.argv[1:],"",["project-name=","source-path="])
 except getopt.GetoptError:
-    print("Usage: main.py --project-name <codebuild-project-name> --source-path <source-path>")
+    print("Usage: main.py --project-name <codebuild-project-name> --source-path <source-path> --source-excludes <comma-seperated-excludes>")
     sys.exit(2)
 
 sourcePath = "."
+sourceExcludes = [".git"]
 projectName = None
 
 for opt, arg in opts:
     if opt == "--source-path":
         sourcePath = arg
+    if opt == "--source-excludes":
+        sourceExcludes = arg.split(",")
     if opt == "--project-name":
         projectName = arg
 
 print("Using project: %s" % (projectName,))
 print("Using source folder: %s" % (sourcePath,))
+print("Using source excludes: %s" % (sourceExcludes,))
 
 # create the code build handler
 cbHandler = CodeBuildHandler.CodeBuildHandler(projectName)
-cbHandler.prepareBuild(sourcePath)
+cbHandler.prepareBuild(sourcePath,sourceExcludes)
 
 logsWatcher = cbHandler.startBuild()
 

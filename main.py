@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import CodeBuildHandler
 import LogsWatcher
 import sys
@@ -45,7 +47,7 @@ while not cbHandler.testBuildFinished():
 newEvents = logsWatcher.getNewLogEvents()
 logsWatcher.printLogEvents(newEvents)
 
-cbHandler.cleanupBuild(sourcePath,sourceExcludes)
+cbHandler.cleanupBuild()
 print("Finished, exiting")
 # return result
 exit(not cbHandler.didBuildSucceed())

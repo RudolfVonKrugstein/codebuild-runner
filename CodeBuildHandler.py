@@ -29,7 +29,7 @@ class CodeBuildHandler:
 
     def cleanupBuild(self):
         s3_client = boto3.client('s3')
-        s3_client.delete_object(Bucket=self.codeBucket, Key=self.codeKey, VersionID=self.sourceVersion)
+        s3_client.delete_object(Bucket=self.codeBucket, Key=self.codeKey, VersionId=self.sourceVersion)
 
     def startBuild(self):
         res = self.client.start_build(projectName=self.projectName,sourceVersion=self.sourceVersion)
@@ -50,6 +50,17 @@ class CodeBuildHandler:
        if finished:
            self.buildResult = res['builds'][0]['buildStatus']
        return finished
+
+    def printSummary(self):
+       res = self.client.batch_get_builds(ids=[self.buildId]) 
+       for phase in res['builds'][0]['phases']:
+           if phase.has_key("phaseStatus"):
+               print(phase['phaseType'] + ": " + phase['phaseStatus'])
+               if phase['phaseStatus'] != "SUCCEEDED":
+                   for context in phase['contexts']:
+                       print("\t" + context['statusCode'] + ": " + context["message"])
+           else:
+               print(phase['phaseType'])
 
     def didBuildSucceed(self):
        return self.buildResult == u'SUCCEEDED'

@@ -49,5 +49,6 @@ logsWatcher.printLogEvents(newEvents)
 
 cbHandler.cleanupBuild()
 print("Finished, exiting")
+cbHandler.printSummary()
 # return result
 exit(not cbHandler.didBuildSucceed())
